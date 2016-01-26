@@ -29,6 +29,8 @@ i=$((SGE_TASK_ID - 1))
 
 BASE_DIR=$HOME/Flux-Surfaces
 TMP_DIR=$(mktemp -d --tmpdir=/fastdata/sm1ajl/temp_run/)
+echo "Temp DIR:"
+echo $TMP_DIR
 
 cp -r $BASE_DIR $TMP_DIR
 cd $TMP_DIR/Flux-Surfaces/
@@ -41,7 +43,9 @@ pwd
 ./configure.py compile sac --clean;
 
 #### Run SAC ####
-python ./run.py SAC --mpi
+#python ./run.py SAC --mpi
+
+python ./run.py gdf --mpi
 
 #### Run the CODE! ####
 #tube_radii=( 'r60' 'r30' 'r10' )

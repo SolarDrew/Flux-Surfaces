@@ -18,7 +18,7 @@
 /
 
 &stoplist
-    tmax=600
+    tmax=10
     itmax = 10000000
 /
 

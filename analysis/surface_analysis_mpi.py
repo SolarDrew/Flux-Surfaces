@@ -78,7 +78,7 @@ def path_join(filename):
 np.save(os.path.join(cfg.data_dir,'Times_{}.npy'.format(cfg.get_identifier())),
         [pysac.yt.SACGDFDataset(fname).current_time for fname in gdf_files])
 #Define a var to limit iterations, no limt = len(ts)
-max_n = 50#len(gdf_files)
+max_n = len(gdf_files)
 
 top_cut = -5
 cube_slice = np.s_[:,:,:top_cut]
