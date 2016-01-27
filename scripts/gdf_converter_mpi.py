@@ -124,7 +124,7 @@ else:
 # Transfer the C order X array to all ranks
 x = comm.bcast(x_xyz, root=0)
 # Make it a quantity.
-x *= u.meter
+x = u.Quantity(x, u.meter)
 
 #==============================================================================
 # Save a gdf file
