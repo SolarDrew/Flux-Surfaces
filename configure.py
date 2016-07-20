@@ -6,7 +6,7 @@ Usage:
     configure.py set SAC [--compiler=<compiler>] [--compiler_flags=<flg>] [--vac_modules=<mod>] [--runtime=<s>] [--mpi_config=<cfg>] [--varnames=<s>] [--grid_size=<grid_size>] [--usr_script=<usr>]
     configure.py set driver [--period=<s>] [--exp_fac=<exp>] [--amp=<amp_str>] [--fort_amp=<fort_amp>] [--delta_x=<delta_x>] [--delta_y=<delta_y>] [--delta_z=<delta_z>] [--identifier=<identifier>]
     configure.py set analysis [--tube_radii=<radii>]
-    configure.py set data [--ini_dir=<dir>] [--out_dir=<dir>] [--data_dir=<dir>] [--gdf_dir=<dir>]
+    configure.py set data [--ini_dir=<dir>] [--ini_filename=<fname>] [--out_dir=<dir>] [--data_dir=<dir>] [--gdf_dir=<dir>]
     configure.py get <key>
     configure.py print [<section>]
     configure.py compile SAC [--clean]
@@ -26,6 +26,7 @@ Options:
     --fort_amp=FAMP  FORTRAN code to calculate the driver amplitude
     --tube-radii=R  A list of flux surface radii to compute analysis for
     --ini_dir=DIR The data directory where the initial conditions are located.
+    --ini_filename=FNAME
     --out_dir=DIR  SAC output data directory
     --data_dir=DIR  ?
     --gdf_dir=DIR  The dir for GDF output, identifier will be appended as a dir
@@ -114,13 +115,15 @@ if arguments['compile'] and arguments['SAC']:
 
     # Distribute ini file:
     os.chdir(cfg.ini_dir)
-    if not os.path.isfile('3D_tube_128_128_128.ini'):
-        raise ValueError("No initial conditions found, please download with ./run.py download ini")
+    if not os.path.isfile('{}.ini'.format(cfg.ini_filename)):
+        #raise ValueError("No initial conditions found, please download with ./run.py download ini")
+        pass
     else:
-        if not len(glob.glob('3D_tube_128_128_128_{}_*.ini'.format(cfg.mpi_config))) == 16:
+        if not len(glob.glob('{}_{}_*.ini'.format(cfg.ini_filename, cfg.mpi_config))) == cfg.mpi_size:
             print "Distributing ini file..."
-            os.system('{} 3D_tube_128_128_128.ini 3D_tube_128_128_128_{}.ini'.format(sac_path('distribution'),
-                                                                                 cfg.mpi_config))
+            print cfg.ini_filename, cfg.mpi_config
+            print '{} {}.ini {}_{}.ini'.format(sac_path('distribution'), cfg.ini_filename, cfg.ini_filename, cfg.mpi_config)
+            os.system('{} {}.ini {}_{}.ini'.format(sac_path('distribution'), cfg.ini_filename, cfg.ini_filename, cfg.mpi_config))
     os.chdir(root_path)
     #==============================================================================
     # Process vac.par
@@ -131,12 +134,13 @@ if arguments['compile'] and arguments['SAC']:
     for i,line in enumerate(f_lines):
         if line.strip().startswith("filenameini="):
             f_lines[i] = '    ' + "filenameini='" + os.path.join(cfg.ini_dir,
-                                        "3D_tube_128_128_128_{}.ini'\n".format(cfg.mpi_config))
+                                        "{}_{}.ini'\n".format(cfg.ini_filename, cfg.mpi_config))
+            print '+++++', f_lines[i]
         if line.strip().startswith("filename="):
             f_lines[i] = '    ' + "filename='" + os.path.join(out_dir,
-                                    "3D_tube128_%s.log'\n"%identifier)
+                                    "{}_{}.log'\n".format(cfg.ini_filename, identifier))
             f_lines[i+1] = "             '" + os.path.join(out_dir,
-                                    "3D_tube128_%s.out'\n"%identifier)
+                                    "{}_{}.out'\n".format(cfg.ini_filename, identifier))
         if line.strip().startswith("wnames="):
             f_lines[i] = '    ' + "wnames='" + ' '.join(cfg.varnames).encode('ascii') +"'\n"
         if line.strip().startswith("tmax="):
@@ -183,7 +187,7 @@ if arguments['compile'] and arguments['SAC']:
     #==============================================================================
     #Compile VAC
     os.chdir(sac_path("src"))
-    os.system('./setvac -u=Slog -p=mhd -d=33 -g={} -on=mpi'.format(cfg.grid_size))
+    os.system('./setvac -u={} -p=mhd -d=33 -g={} -on=mpi'.format(cfg.usr_script, cfg.grid_size))
     os.system('./setvac -s')
     if arguments['--clean']:
         os.system('./sac_fabricate.py --clean')
