@@ -8,6 +8,8 @@ cfg = sacconfig.SACConfig()
 
 F_compiler = cfg.compiler
 F_flags = cfg.compiler_flags.split(' ')
+#F_flags.append('-fdefault-integer-8')
+F_flags.append('-mcmodel=medium')
 F_ext = '.f'
 
 pre_processor = './vacpp.sh'
