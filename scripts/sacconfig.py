@@ -18,6 +18,9 @@ class SACConfig(object):
     def _set_value(self, section, option, value):
         self.cfg.set(section, option, str(value))
 
+    def _to_str(self, value):
+        return str(value).replace('.','-')
+
 #==============================================================================
 #   SAC Configs
 #==============================================================================
@@ -267,6 +270,14 @@ class SACConfig(object):
     def ini_dir(self, value):
         self._set_value('data', 'ini_dir', value)
 
+    @property
+    def ini_filename(self):
+        return self._get_value('data', 'ini_filename')
+
+    @ini_filename.setter
+    def ini_filename(self, value):
+        self._set_value('data', 'ini_filename', value)
+
 #==============================================================================
 #   Utils
 #==============================================================================
@@ -274,7 +285,7 @@ class SACConfig(object):
         id = ""
         for tag in self.identifier:
             x = getattr(self, tag)
-            id += "{0}_".format(x)
+            id += "{0}_".format(self._to_str(x))
         return id[:-1]  # Last _ is not wanted
 
     def save_cfg(self):
@@ -334,6 +345,7 @@ class SACConfig(object):
             print "data:"
             print "-"*79
             print "ini_dir:", self.ini_dir
+            print "ini_filename:", self.ini_filename
             print "out_dir:", self.out_dir
             print "data_dir:", self.data_dir
             print "gdf_dir:", self.gdf_dir
