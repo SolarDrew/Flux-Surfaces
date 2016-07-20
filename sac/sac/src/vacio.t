@@ -636,6 +636,7 @@ subroutine readfileini_asc(w)
      if(ios<0)exit                ! Cycle until the last recorded state
      if(oktest) write(unitterm,*)'fileheadini=',fileheadini(1:30)
      read(unitini,*,iostat=ios)it,t,ndimini,neqparini,nwini
+
      if(oktest) write(unitterm, &
           "('it=',i7,' t=',g10.3,' ndim=',i3,' neqpar=',i3,' nw=',i3)")&
           it,t,ndimini,neqparini,nwini
@@ -711,6 +712,7 @@ subroutine readfileini_bin(w)
      if(ios<0)exit                ! Cycle until the last recorded state
      if(oktest) write(unitterm,*)'fileheadini=',fileheadini(1:30)
      read(unitini,iostat=ios)it,t,ndimini,neqparini,nwini
+
      if(oktest) write(unitterm, &
           "('it=',i7,' t=',g10.3,' ndim=',i3,' neqpar=',i3,' nw=',i3)")&
           it,t,ndimini,neqparini,nwini
@@ -759,12 +761,12 @@ subroutine checkNdimNeqparNw(ndimini,neqparini,nwini,neqparin,nwin)
   !-----------------------------------------------------------------------------
 
   if(ndim/=abs(ndimini))then
-     write(*,*)'Error in ReadFileini: ndimini=',ndimini
+     write(*,*)'Error in ReadFileini: ndimini=',ndimini,ndim
      call die('Incompatible dimensionalities')
   endif
 
   if(neqpar+nspecialpar/=neqparini)write(*,"(a,i3,a,i3)")&
-       'Warning in ReadFileini: number of eq.params=',neqpar,&
+       'Warning in ReadFileini: number of eq.params=',neqpar+nspecialpar,&
        ' /= neqparini=',neqparini
 
   if(nw/=nwini)write(*,"(a,i3,a,i3)")&
