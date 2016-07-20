@@ -25,6 +25,10 @@ import pysac.analysis.tube3D.tvtk_tube_functions as ttf
 sys.path.append('../')
 from scripts import sacconfig
 
+import resource
+import objgraph
+import psutil
+
 try:
     import docopt
 except ImportError:
@@ -43,6 +47,23 @@ except ImportError:
     mpi = False
     rank = 0
 
+def b2h(n):
+    # http://code.activestate.com/recipes/578019
+    # >>> bytes2human(10000)
+    # '9.8K'
+    # >>> bytes2human(100001221)
+    # '95.4M'
+    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    prefix = {}
+    for i, s in enumerate(symbols):
+        prefix[s] = 1 << (i + 1) * 10
+    for s in reversed(symbols):
+        if n >= prefix[s]:
+            value = float(n) / prefix[s]
+            return '%.1f%s' % (value, s)
+    return "%sB" % n
+
+#print 'rank', rank, -9, b2h(psutil.virtual_memory().active)
 #==============================================================================
 # Config
 #==============================================================================
@@ -51,10 +72,12 @@ tube_r = arguments['--tube-r']
 
 cfg = sacconfig.SACConfig()
 
+#print 'rank', rank, -8, b2h(psutil.virtual_memory().active)
 #Make the pull paths
 data_dir = os.path.join(cfg.data_dir,'%s/'%tube_r)
 gdf_files = glob.glob(os.path.join(cfg.gdf_dir, cfg.get_identifier()+'_0*.gdf'))
 gdf_files.sort()
+#print 'rank', rank, -7, b2h(psutil.virtual_memory().active)
 
 if rank == 0:
     print "Configuration:"
@@ -70,6 +93,8 @@ if rank == 0: #Prevents race condition where one processes creates the dir
 def path_join(filename):
     return os.path.join(data_dir,filename)
 
+
+#print 'rank', rank, -6, b2h(psutil.virtual_memory().active)
 #==============================================================================
 # TimeSeries, data slices and other constants
 #==============================================================================
@@ -78,7 +103,8 @@ def path_join(filename):
 np.save(os.path.join(cfg.data_dir,'Times_{}.npy'.format(cfg.get_identifier())),
         [pysac.yt.SACGDFDataset(fname).current_time for fname in gdf_files])
 #Define a var to limit iterations, no limt = len(ts)
-max_n = 50#len(gdf_files)
+#max_n = 10
+max_n = len(gdf_files)
 
 top_cut = -5
 cube_slice = np.s_[:,:,:top_cut]
@@ -91,6 +117,7 @@ n_lines = 100
 #the line is the fieldline to use as "the line"
 line_n = 25
 
+#print 'rank', rank, -5, b2h(psutil.virtual_memory().active)
 #==============================================================================
 # Do Serial compute of seed points
 # Use h5py as it is very slightly faster than yt(2.6):
@@ -127,7 +154,7 @@ if rank == 0:
     save_times.append(t1)
 
     for i in range(0,max_n):
-        print i
+        #print i
         f = h5py.File(gdf_files[i])
         t1 = save_times[-1]
         t2 = f['simulation_parameters'].attrs['current_time']
@@ -144,6 +171,7 @@ else:
     surf_seeds = None
     save_times = []
 
+#print 'rank', rank, -4, b2h(psutil.virtual_memory().active)
 ## tvtk objects are presumeably not pikleable, therefore cannot be trasmitted
 ## via MPI, create the tvtk object upon recieve.
 surf_seeds_arr = np.array(surf_seeds)
@@ -173,6 +201,7 @@ if mpi:
 else:
     rank_indices = all_indices
 
+#print 'rank', rank, -3, b2h(psutil.virtual_memory().active)
 #==============================================================================
 # Begin Parallel compute
 #==============================================================================
@@ -195,6 +224,7 @@ fwfield = vector_field(f_wave[0,:,:,:][cube_slice],
                        f_wave[2,:,:,:][cube_slice],
                        name="Wave Flux",figure=None)
 
+#print 'rank', rank, -2, b2h(psutil.virtual_memory().active)
 #Make surface using seeds, surf filter and contour
 surf_field_lines, surface = ttf.create_flux_surface(bfield.outputs[0], surf_seeds[0])
 
@@ -222,6 +252,7 @@ the_line = ttf.get_the_line(bfield.outputs[0], surf_seeds[0], line_n)
 #Number of indicies for this process:
 number_ind = len(rank_indices)
 
+#print 'rank', rank, -1, b2h(psutil.virtual_memory().active)
 #==============================================================================
 # Set up arrays to store all the varibles for all the timesteps
 #==============================================================================
@@ -253,6 +284,9 @@ Fperp_avg = np.zeros([number_ind])
 Fphi_avg = np.zeros([number_ind])
 
 for i,n in enumerate(rank_indices):
+    print 'rank', rank, 0, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 0, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    #objgraph.show_growth(limit=5)
     ds = pysac.yt.SACGDFDataset(gdf_files[n])
     #ds = ts[n]
     [bfield, vfield, density,
@@ -292,7 +326,7 @@ for i,n in enumerate(rank_indices):
     surface_beta = ttf.update_interpolated_scalars(surface.output, surface_beta_filter)
     surface_cs = ttf.update_interpolated_scalars(surface.output, surface_cs_filter)
 
-    #Save to file
+    #Save the file
     writer = ttf.PolyDataWriter(path_join("Fieldline_surface_{}_{:05d}.vtp".format(cfg.get_identifier(), n+1)),
                                 surface.output)
     writer.add_array(perp=normals,
@@ -308,12 +342,15 @@ for i,n in enumerate(rank_indices):
                      surface_beta=surface_beta,
                      surface_cs=surface_cs)
     writer.write()
+    #print 'rank', rank, 0.5, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 0.5, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
 #==============================================================================
 # Save out a long one field line
 #==============================================================================
     the_line = ttf.update_the_line(the_line, surf_seeds[n].points, line_n,
                                    len(the_line.output.points))
+    #print 'rank', rank, 0.6, b2h(psutil.virtual_memory().active)
 
     #line varibles
     surf_line_index, surf_line_points = ttf.get_surface_indexes(surface.output,
@@ -336,25 +373,39 @@ for i,n in enumerate(rank_indices):
     beta_line[i] = surface_beta[surf_line_index]
     cs_line[i] = surface_cs[surf_line_index]
 
+    del vpar, vperp, vphi, bpertperp, bpertpar, bpertphi, surface_density, surface_va, surface_beta, surface_cs
+    #print 'rank', rank, 1, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 1, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    #objgraph.show_growth(limit=5)
 #==============================================================================
 # Wave Flux
 #==============================================================================
     f_wave = pysac.analysis.get_wave_flux_yt(ds)  # , B_to_SI=1e-4, V_to_SI=1e-2, Pk_to_SI=1e-1)
+    #print 'rank', rank, 1.5, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank,  1.5, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
     fwfield.set(vector_data = np.rollaxis(np.array([f_wave[0,:,:,:][cube_slice],
                                                     f_wave[1,:,:,:][cube_slice],
                                                     f_wave[2,:,:,:][cube_slice]]),
                                           0, 4))
 
+    #print 'rank', rank, 2, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 2, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     surface_fwave = ttf.update_interpolated_vectors(False, surface_fwave_filter)
 
+    #print 'rank', rank, 3, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 3, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     Fwperp, Fwpar, Fwphi = ttf.get_surface_velocity_comp(surface_fwave,
                                                          normals, torsionals,
                                                          parallels)
 
+    #print 'rank', rank, 4, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 4, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     # Save out the Wave Flux to a smaller file, with vector info
     writer = ttf.PolyDataWriter(path_join("WaveFlux_{}_{:05d}.vtp".format(cfg.get_identifier(), n+1)),
                                 surface.output)
+    #print 'rank', rank, 5, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 5, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     writer.add_array(par=parallels,
                      perp=normals,
                      phi=torsionals,
@@ -363,22 +414,30 @@ for i,n in enumerate(rank_indices):
                      Fwphi=Fwphi)
     writer.write()
 
+    #print 'rank', rank, 6, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 6, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     # Line Flux
     Fpar_line[i] = Fwpar[surf_line_index]
     Fperp_line[i] = Fwperp[surf_line_index]
     Fphi_line[i] = Fwphi[surf_line_index]
 
+    #print 'rank', rank, 7, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 7, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     # Whole Surface Avg
     Fperp_avg[i] = np.mean(Fwperp)
     Fpar_avg[i] = np.mean(Fwpar)
     Fphi_avg[i] = np.mean(Fwphi)
 
+    #print 'rank', rank, 8, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 8, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     #Save waveflux to the gdf file:
     fname, ext = os.path.splitext(ds.parameter_filename)
     fprefix = fname[:-6]
     fnumber = fname[-6:]
     new_name = fprefix + '_fwave' + fnumber + ext
 
+    #print 'rank', rank, 9, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 9, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     f = h5py.File(new_name, mode='w')
     simulation_params = pysac.io.gdf_writer.SimulationParameters()
     simulation_params['dimensionality'] = 3
@@ -390,6 +449,8 @@ for i,n in enumerate(rank_indices):
     simulation_params['field_ordering'] = 0
     simulation_params['boundary_conditions'] = np.zeros([6], dtype=int)+2
 
+    #print 'rank', rank, 10, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 10, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     f = pysac.io.gdf_writer.create_file(f, simulation_params, ds.domain_dimensions,
                                         data_author="Flux-Surfaces")
 
@@ -400,7 +461,12 @@ for i,n in enumerate(rank_indices):
     fwave_z = u.Quantity(f_wave[2,:,:,:], unit='W/m2')
     pysac.io.gdf_writer.write_field(f, fwave_z, 'wave_flux_z', 'z Compoment of Wave Energy Flux')
     f.close()
+    del f_wave, fwave_x, fwave_y, fwave_z
 
+    #print 'rank {} step {}'.format(rank, i), objgraph.show_growth()#limit=5)
+    print 'rank', rank, 11, b2h(psutil.virtual_memory().active)
+    #print 'rank', rank, 11, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    objgraph.show_growth(limit=5)
     print "%i: Done Flux %i \n%i: Step %i / %i"%(rank,n,rank,i,len(rank_indices))
 
 #==============================================================================
@@ -509,5 +575,6 @@ if rank == 0:
     np.save(path_join("AverageFlux_{}_Fperp.npy".format(cfg.get_identifier())), Fperp_avg)
     np.save(path_join("AverageFlux_{}_Fpar.npy".format(cfg.get_identifier())), Fpar_avg)
     np.save(path_join("AverageFlux_{}_Fphi.npy".format(cfg.get_identifier())), Fphi_avg)
+
 
 print "Analysis Complete"
