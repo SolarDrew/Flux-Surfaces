@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #$ -l h_rt=15:00:00
 #$ -cwd
 #$ -l arch=intel*
@@ -7,43 +7,52 @@
 #$ -P mhd
 #$ -q mhd.q
 #$ -N all_periods
-#$ -j y
-#$ -t 1 
+#$ -i y
+#$ -t 1
 
 source $HOME/.bashrc
-module load mpi/intel/openmpi/1.8.3
-module load apps/python2-virtual/2.7.6
-workon vtk6
-export PATH=:/home/smq11sjm/.virtualenvs/vtk6/bin:$PATH
-export LD_LIBRARY_PATH=/home/smq11sjm/.virtualenvs/vtk_hdf/lib/vtk-6.1/:$LD_LIBRARY_PATH
+module purge
+module load apps/python/conda
+module load /mpi/gcc/openmpi/1.10.0
+source activate mpi-sac
 echo $(which python)
+echo $(which mpirun)
+echo $(which mpif90)
 #################################################################
 ################ Set the Parameters for the array ###############
 #################################################################
-drivers=('Slog')
+
 
 #################################################################
 ####################### Run the Script ##########################
 #################################################################
 
 #### Setup and Configure ####
-i=$((SGE_TASK_ID - 1))
+#i=$((SGE_TASK_ID - 1))
+i=0
 
-BASE_DIR=$HOME/GitHub/SWAT/Flux-Surfaces
-TMP_DIR=$(mktemp -d --tmpdir=/fastdata/smq11sjm/temp_run/)
+BASE_DIR=/data/sm1ajl/Flux-Surfaces/
+TMP_DIR=$(mktemp -d --tmpdir=/fastdata/sm1ajl/temp_run/)
 
 cp -r $BASE_DIR $TMP_DIR
 cd $TMP_DIR/Flux-Surfaces/
 pwd
 
-echo ${periods[i]} ${amps[i]} "${fortamps[i]}"
-#./configure.py set driver --period=${periods[i]} --amp=${amps[i]} --fort_amp="${fortamps[i]}";
-./configure.py set driver --driver=${drivers[i]};
+./configure.py set SAC --usr_script="Slog"
+./configure.py set driver --exp_fac=0.15 --period=180
+
+#### Run SAC ####
+deltas=( "0.15" "0.20" "0.25" "0.30" "0.35" )
+amps=( "7.2274441701395986" "5.2788458200228927" "4.167609775756989" "3.4471974045012397" "2.9411894675997523" )
+
+echo ${deltas[i]} ${amps[i]} ${amps[i]:0:3}
+./configure.py set driver --delta_x=${deltas[i]} --delta_y=${deltas[i]} --amp=${amps[i]:0:3} --fort_amp=${amps[i]}d0
+./configure.py set data --ini_filename=3D_tube_128_128_128
 ./configure.py print;
 ./configure.py compile sac --clean;
 
-#### Run SAC ####
 python ./run.py SAC --mpi
+python ./run.py gdf --mpi
 
 #### Run the CODE! ####
 tube_radii=( 'r60' 'r30' 'r10' )
@@ -52,7 +61,6 @@ do
     echo $tuber
     python ./run.py analysis --mpi --tube-r=$tuber
 done
+
 ###### I Done it now ########
-rm -r $TMP_DIR
-pushover -m "Job "${drivers[i]}" Complete"
-echo "Job "${drivers[i]}" Complete"
+rm -rf $TMP_DIR
