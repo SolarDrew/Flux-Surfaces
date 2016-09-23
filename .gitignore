@@ -37,3 +37,7 @@ sac/src/.deps
 *.pytxpyg
 data/3D_tube_128_128_128.ini
 data/3D_tube_128_128_128*.ini
+
+m0_analysis.o*
+m0_analysis.e*
+m0_analysis.po*

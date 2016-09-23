@@ -1,11 +1,11 @@
 &testlist /
 &filelist
-    filenameini='/mnt/fastdata/smq11sjm/inidata/3D_tube_128_128_128_np020204.ini'
-    typefileini='binary'
+    filenameini='/mnt/fastdata/sm1ajl/inidata/fredatmos_np020204.ini'
+    typefileini='ascii'
     fullgridini= T
     fullgridout= T
-    filename='/mnt/fastdata/smq11sjm/Flux_Surfaces/outs/3D_tube128_Slog_p240-0_A10_B005.log'
-             '/mnt/fastdata/smq11sjm/Flux_Surfaces/outs/3D_tube128_Slog_p240-0_A10_B005.out'
+    filename='/mnt/fastdata/sm1ajl/Flux-Surfaces/outs/fredatmos_m0_p120-0_0-5_0-5.log'
+             '/mnt/fastdata/sm1ajl/Flux-Surfaces/outs/fredatmos_m0_p120-0_0-5_0-5.out'
 
     typefileout='binary'
     typefilelog='default'
@@ -18,8 +18,8 @@
 /
 
 &stoplist
-    tmax=600
-    itmax = 10000000
+    tmax=10
+    itmax = 10
 /
 
 &testlist /

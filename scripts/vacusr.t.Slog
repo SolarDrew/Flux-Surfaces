@@ -70,11 +70,11 @@
  delta_y = 0.5d6
 
     !### AMPLITUDE ###
-  AA = 10.d0
+  AA = 0.d0
     !### EXP_FAC ###
   B = 0.05
     !### PERIOD ###
-  s_period = 240.0
+  s_period = 330.0
 
     tdep=SIN(qt*2.d0*pi/s_period)
     {^IFMPI IF (ipe.EQ.0)} PRINT*, "tdep==",tdep

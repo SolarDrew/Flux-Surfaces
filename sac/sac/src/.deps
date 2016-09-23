@@ -1,8 +1,8 @@
 {
     "./vacpp.sh vac.t vac.f": {
         ".": "input-5058f1af8388633f609cadb75a75dc9d", 
-        "vac.f": "output-90d446c582490b0d38e3034e50d43364", 
-        "vac.t": "input-fcd52b234f1446d5d9ba709a25eacf4e", 
+        "vac.f": "output-4c448cc1be013bf68d429ac7082d8e5b", 
+        "vac.t": "input-4efec8cb49a820a1c06f40c3d03bf740", 
         "vacpp.pl": "input-884ae4d80f33f29da7903d280eaaae13", 
         "vacpp.sh": "input-b5b25b7b96819a8108105fbb64ab0b39"
     }, 
@@ -15,8 +15,8 @@
     }, 
     "./vacpp.sh vacdef.t vacdef.f": {
         ".": "input-5058f1af8388633f609cadb75a75dc9d", 
-        "vacdef.f": "output-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
-        "vacdef.t": "input-0f75374c2b87a775bc3e617a7577a47f", 
+        "vacdef.f": "output-fe497d0964f085c9e3538715d1370821", 
+        "vacdef.t": "input-f544f3d4c4130bf131c684de2293430d", 
         "vacpp.pl": "input-884ae4d80f33f29da7903d280eaaae13", 
         "vacpp.sh": "input-b5b25b7b96819a8108105fbb64ab0b39"
     }, 
@@ -29,8 +29,8 @@
     }, 
     "./vacpp.sh vacio.t vacio.f": {
         ".": "input-5058f1af8388633f609cadb75a75dc9d", 
-        "vacio.f": "output-ab7f76df5ffae3320e2da2324c10f5fa", 
-        "vacio.t": "input-9aea614586b1d56b57beb4b55b369532", 
+        "vacio.f": "output-f9ce41b7c1baff7119aa03a4bbd637fc", 
+        "vacio.t": "input-ae4249ed12d73aa3e51be0e7cf703391", 
         "vacpp.pl": "input-884ae4d80f33f29da7903d280eaaae13", 
         "vacpp.sh": "input-b5b25b7b96819a8108105fbb64ab0b39"
     }, 
@@ -67,9 +67,9 @@
         ".": "input-5058f1af8388633f609cadb75a75dc9d", 
         "vacpp.pl": "input-884ae4d80f33f29da7903d280eaaae13", 
         "vacpp.sh": "input-b5b25b7b96819a8108105fbb64ab0b39", 
-        "vacusr.f": "output-43e4b68a2df49580bd0849e7cf354c92", 
+        "vacusr.f": "output-881c735759948d1c73084077da646d8d", 
         "vacusr.gravity.t": "input-c41ed5d49e16f88969069a97388de058", 
-        "vacusr.t": "input-26acfe99168eaf366d9ed56b1a38de08", 
+        "vacusr.t": "input-5d03b095a85a03e2a44e803fcab03b65", 
         "vacusr.viscosity.t": "input-f8cc2004ad279b798a84765e2726198c"
     }, 
     "./vacpp.sh vacusrpar.t vacusrpar.f": {
@@ -80,70 +80,79 @@
         "vacusrpar.t": "input-cc70216b73e0b9d4de153c2b2d5f53ed"
     }, 
     ".deps_version": 2, 
-    "mpif90 -free -mcmodel=medium -O3 -c vac.f": {
-        "vac.f": "input-90d446c582490b0d38e3034e50d43364", 
-        "vac.o": "output-833efa39d88b149d7c933c6c01e5708f", 
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vac.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vac.f": "input-4c448cc1be013bf68d429ac7082d8e5b", 
+        "vac.o": "output-ff525cdeb201794cde14b8b2020bcbf3", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vaccd.f": {
+    "mpif90 -ffree-form -mcmodel=medium -c vaccd.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
         "vaccd.f": "input-76d94189d1b12611804044c050d6a17e", 
-        "vaccd.o": "output-adb6da4703d737e78e29cb28490b2927", 
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+        "vaccd.o": "output-8f4a59d056ab4c65e0965dff0d68c0a7", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacgrid.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacgrid.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacgrid.f": "input-927524b674f1989593da6e76927cf649", 
-        "vacgrid.o": "output-405b74696674a1aeffea161ed58cf589", 
+        "vacgrid.o": "output-e9bf2cfe4aa7c421c57c05cca173ded5", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacio.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
-        "vacio.f": "input-ab7f76df5ffae3320e2da2324c10f5fa", 
-        "vacio.o": "output-1a976afc6265a8ecb5522c2cd80ff69e", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacio.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
+        "vacio.f": "input-f9ce41b7c1baff7119aa03a4bbd637fc", 
+        "vacio.o": "output-ac855f59a9bf43527a57918e5ba6c42f", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacmpi.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacmpi.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacmpi.f": "input-9e33837ed6df89c541fec11dac9247f3", 
-        "vacmpi.o": "output-56cb8117df04bda992cd5b50db872f3c", 
+        "vacmpi.o": "output-41b524d4fce8ba9c14da5dca5bebb95d", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacphys.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacphys.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacphys.f": "input-44e52fd78f6eb5e7ee9234e7487d13d0", 
-        "vacphys.o": "output-c022cda983ca8f080659c0ece4ab94f8", 
+        "vacphys.o": "output-eb09211f2f7148fe43053f167ab2ed5f", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacphys0.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacphys0.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
         "vacphys0.f": "input-11c5e70ed74db1a7d6486ea18503fc03", 
-        "vacphys0.o": "output-1bf48984ea85ca312ee0350fdc486a8c", 
+        "vacphys0.o": "output-5bd7b87193f132b7b2d50dbc24266516", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
-    "mpif90 -free -mcmodel=medium -O3 -c vacusr.f": {
-        "vacdef.f": "input-3cbd71ab5cb9bc91886019e4d0e9ec4b", 
+    "mpif90 -ffree-form -mcmodel=medium -c vacusr.f": {
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vacdef.f": "input-fe497d0964f085c9e3538715d1370821", 
         "vacpar.f": "input-95aece94f70ae9c729fc0c1612125105", 
-        "vacusr.f": "input-43e4b68a2df49580bd0849e7cf354c92", 
-        "vacusr.o": "output-fe8042f431e4b2d0525c3ca02795f36e", 
+        "vacusr.f": "input-881c735759948d1c73084077da646d8d", 
+        "vacusr.o": "output-ee2e717083f06127513b791e16555240", 
         "vacusrpar.f": "input-041c0f42504a9ef4f882b77d0da0dfb9"
     }, 
     "mpif90 -o ../vac vac.o vacio.o vacgrid.o vacphys0.o vacphys.o vacusr.o vaccd.o vacmpi.o": {
-        "vac.o": "input-833efa39d88b149d7c933c6c01e5708f", 
-        "vaccd.o": "input-adb6da4703d737e78e29cb28490b2927", 
-        "vacgrid.o": "input-405b74696674a1aeffea161ed58cf589", 
-        "vacio.o": "input-1a976afc6265a8ecb5522c2cd80ff69e", 
-        "vacmpi.o": "input-56cb8117df04bda992cd5b50db872f3c", 
-        "vacphys.o": "input-c022cda983ca8f080659c0ece4ab94f8", 
-        "vacphys0.o": "input-1bf48984ea85ca312ee0350fdc486a8c", 
-        "vacusr.o": "input-fe8042f431e4b2d0525c3ca02795f36e"
+        ".": "input-5058f1af8388633f609cadb75a75dc9d", 
+        "vac.o": "input-ff525cdeb201794cde14b8b2020bcbf3", 
+        "vaccd.o": "input-8f4a59d056ab4c65e0965dff0d68c0a7", 
+        "vacgrid.o": "input-e9bf2cfe4aa7c421c57c05cca173ded5", 
+        "vacio.o": "input-ac855f59a9bf43527a57918e5ba6c42f", 
+        "vacmpi.o": "input-41b524d4fce8ba9c14da5dca5bebb95d", 
+        "vacphys.o": "input-eb09211f2f7148fe43053f167ab2ed5f", 
+        "vacphys0.o": "input-5bd7b87193f132b7b2d50dbc24266516", 
+        "vacusr.o": "input-ee2e717083f06127513b791e16555240"
     }
 }

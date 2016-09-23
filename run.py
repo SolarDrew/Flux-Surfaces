@@ -41,9 +41,9 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 arguments = docopt.docopt(__doc__, version='1.0.0')
 
-
-from scripts import sacconfig
+from scripts import sacconfig, utils
 cfg = sacconfig.SACConfig()
+#utils.set_amplitude(cfg)
 
 #MPI Exec function
 def mpi_exec(arguments, command):
@@ -69,7 +69,7 @@ if arguments['gdf'] or arguments['SAC'] == 'gdf':
 #Run Analysis
 if arguments['analysis']:
     os.chdir("analysis")
-    mpi_exec(arguments, './surface_analysis_mpi.py --tube-r=%s'%arguments['--tube-r'])
+    mpi_exec(arguments, 'xvfb-run --auto-servernum ./surface_analysis_mpi.py --tube-r=%s'%arguments['--tube-r'])
     os.chdir("../")
 
 #Run Flux Calcs
@@ -123,3 +123,4 @@ if arguments['download'] or arguments['SAC'] == 'download':
             pos += len(chunk)
             pbar.update(pos)
     pbar.finish()
+

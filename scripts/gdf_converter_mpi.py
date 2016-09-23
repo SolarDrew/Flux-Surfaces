@@ -16,7 +16,7 @@ import numpy as np
 import astropy.units as u
 
 from pysac.io.legacy import VACfile
-from pysac.io.legacy.gdf_converter import convert_w_3D, write_gdf
+from pysac.io.legacy.gdf_converter import convert_w_3D, write_gdf, write_gdf_highres
 from pysac.io.legacy.util import mag_convert
 
 from mpi4py import MPI
@@ -149,12 +149,18 @@ for i in range(0,vfile.num_records,1):
     #header['nx'] = full_nx
     header['nx'] = [full_nx[1], full_nx[2], full_nx[0]]
 
+    print rank, i, cfg.get_identifier()+'_{:05d}.gdf'.format(i+1)
     f = h5py.File(os.path.join(output_path,
                                cfg.get_identifier()+'_{:05d}.gdf'.format(i+1)),
                   'w', driver='mpio', comm=MPI.COMM_WORLD)
 
-#    write_gdf(f, header, x, fields, arr_slice=arr_slice,
-    write_gdf(f, header, left, right, fields, arr_slice=arr_slice,
-              data_author = "Drew Leonard",
-              data_comment = "Converted from outfiles in parallel", collective=False)#True)
+    if full_nx[0]*full_nx[1]*full_nx[2] <= 64*64*32:
+        write_gdf(f, header, x, fields, arr_slice=arr_slice,
+                  data_author = "Drew Leonard",
+                  data_comment = "Converted from outfiles in parallel", collective=False)#True)
+    else:
+        write_gdf_highres(f, header, left, right, fields, arr_slice=arr_slice,
+                          data_author = "Drew Leonard",
+                          data_comment = "Converted from outfiles in parallel", collective=False)
+
 print "rank %i finishes"%rank

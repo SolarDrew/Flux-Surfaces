@@ -45,7 +45,7 @@ F77FLG=-132 -dusty -Mnobounds
 #F90=/usr/local/mpich-gm2_PGI/bin/mpif90
 #F90=/usr/local/packages5/openmpi-pgi/bin/mpif90
 
-F90=/usr/local/mpi/pgi/openmpi/1.6.4/bin/mpif90
+F90=mpif90 #/usr/local/mpi/pgi/openmpi/1.6.4/bin/mpif90
 F90FLG=-Mfreeform -Mnobounds
 
 #
