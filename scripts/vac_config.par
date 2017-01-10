@@ -1,49 +1,34 @@
-&testlist /
-&filelist
-    filenameini='/mnt/fastdata/sm1ajl/inidata/fredatmos_np020204.ini'
-    typefileini='ascii'
-    fullgridini= T
-    fullgridout= T
-    filename='/mnt/fastdata/sm1ajl/Flux-Surfaces/outs/fredatmos_m0_p120-0_0-5_0-5.log'
-             '/mnt/fastdata/sm1ajl/Flux-Surfaces/outs/fredatmos_m0_p120-0_0-5_0-5.out'
+&testlist
+/
 
-    typefileout='binary'
-    typefilelog='default'
-    
+&filelist
+	filenameini='data/riemann-test11_np01.ini'
+	filename=   'data/riemann-test11.log',
+    		    'data/riemann-test11.out'
+	typefileout='ascii'
 /
 
 &savelist
-    dtsave=1.0,1.0
-    
+	itsave(1,2)=0
+	ditsave=5,5
 /
 
 &stoplist
-    tmax=10
-    itmax = 10
+    tmax=0.3
 /
 
-&testlist /
-
 &methodlist
+	wnames='rhop m1 Ep b1p rhob Eb b1b'
+	typefull= 4*'cd4',3*'nul'
+    typeadvance='fourstep'
+    dimsplit=F
+    typelimiter='woodward'
+/
 
-    wnames='h m1 m2 m3 e b1 b2 b3 eb rhob bg1 bg2 bg3'
-    typefull=   8*'cd4',5*'nul'
-    typeadvance=    'onestep'
-    typefilter= 13*'nul'
-    dimsplit=   F
-    sourcesplit=    F
-    divBfix=    F
- /
+&boundlist
+	typeB=	28*'cont'
+/
 
- &boundlist
-    typeB=  13*'fixed'
-        13*'fixed'
-        13*'fixed'
-        13*'fixed'
-                
- /
-
- &paramlist
+&paramlist
     courantpar=0.2
-
- /
+/
