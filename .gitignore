@@ -30,7 +30,8 @@
 *.ipynb_checkpoints
 *.o
 *.f
-sac/src/.deps
+sac/sac/src/.deps
+sac/sac/vac
 
 *.pkl
 *.pytxmcr
