@@ -35,9 +35,11 @@ sac/src/.deps
 *.pkl
 *.pytxmcr
 *.pytxpyg
-data/3D_tube_128_128_128.ini
-data/3D_tube_128_128_128*.ini
+*.ini
+*.gdf
+*.png
 
-m0_analysis.o*
-m0_analysis.e*
-m0_analysis.po*
+*.o*
+*.e*
+*.po*
+*.save
