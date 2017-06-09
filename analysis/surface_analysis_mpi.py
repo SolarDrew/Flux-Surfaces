@@ -18,6 +18,7 @@ import yt
 
 import pysac.io
 import pysac.yt
+yt.funcs.mylog.setLevel(50)
 import pysac.io.gdf_writer
 import pysac.analysis.tube3D.process_utils as util
 import pysac.analysis.tube3D.tvtk_tube_functions as ttf
@@ -106,7 +107,7 @@ np.save(os.path.join(cfg.data_dir,'Times_{}.npy'.format(cfg.get_identifier())),
 #max_n = 10
 max_n = len(gdf_files)
 
-top_cut = -5
+top_cut = -10
 cube_slice = np.s_[:,:,:top_cut]
 x_slice = np.s_[:,:,:,:top_cut]
 ds = pysac.yt.SACGDFDataset(gdf_files[0])
@@ -128,6 +129,7 @@ if rank == 0:
 
     save_times = []
     xmax, ymax, zmax = ds.domain_dimensions - 1
+    dx = ds.domain_width / ds.domain_dimensions
     zmax += top_cut
     #nlines is the number of fieldlines used in the surface
     n_lines = 100
@@ -142,13 +144,13 @@ if rank == 0:
                           name="Velocity Field", figure=None).outputs[0]
 
     #Define domain parameters
-    domain = {'xmax':xmax,'ymax':ymax,'zmax':0}
+    domain = {'xmax':xmax,'ymax':ymax,'zmax':zmax}#0}
     #Create initial seed points in tvtk.PolyData
     surf_seeds_poly = ttf.make_circle_seeds(n_lines, int(tube_r[1:]), **domain)
     #Make surface using seeds, surf filter and contour
     #Extract all times
     next_seeds = np.array(surf_seeds_poly.points)
-    next_seeds[:,-1] = zmax
+    #next_seeds[:,-1] = zmax
     surf_seeds = [next_seeds]
     t1 = f['simulation_parameters'].attrs['current_time']
     save_times.append(t1)
@@ -164,8 +166,8 @@ if rank == 0:
                               f['data/grid_0000000000']['velocity_z'][seeds_slice] / 1e3 * 1e-2,
                               name="Velocity Field", figure=None).outputs[0]
 
-        next_seeds = ttf.move_seeds(surf_seeds_poly, vfield, t2-t1)
-        next_seeds[:,-1] = zmax
+        next_seeds = ttf.move_seeds(surf_seeds_poly, vfield, t2-t1, dx)
+        #next_seeds[:,-1] = zmax
         surf_seeds.append(next_seeds)
 else:
     surf_seeds = None
@@ -208,7 +210,7 @@ else:
 ds = pysac.yt.SACGDFDataset(gdf_files[0])
 #ds = ts[0]
 #Read in all data from hdf5 file
-bfield, vfield, density, valf, cs, beta = util.get_yt_mlab(ds, cube_slice, flux=True)
+bfield, vfield, density, valf, cs, beta, r_pos = util.get_yt_mlab(ds, cube_slice, flux=True)
 
 bpert = util.yt_to_mlab_vector(ds,
                                'mag_field_x_pert',
@@ -246,6 +248,8 @@ surface_va_filter, surface_va = ttf.interpolate_vectors(valf.outputs[0], poly_no
 surface_cs_filter, surface_cs = ttf.interpolate_vectors(cs.outputs[0], poly_norms.output)
 surface_beta_filter, surface_beta = ttf.interpolate_vectors(beta.outputs[0], poly_norms.output)
 
+surface_r_pos_filter, surface_r_pos = ttf.interpolate_vectors(r_pos.outputs[0], poly_norms.output)
+
 #Make the line
 the_line = ttf.get_the_line(bfield.outputs[0], surf_seeds[0], line_n)
 
@@ -278,6 +282,8 @@ va_line = np.zeros([number_ind, len(the_line.output.points)])
 beta_line = np.zeros([number_ind, len(the_line.output.points)])
 cs_line = np.zeros([number_ind, len(the_line.output.points)])
 
+r_pos_line = np.zeros([number_ind, len(the_line.output.points)])
+
 # Whole surface Avgs
 Fpar_avg = np.zeros([number_ind])
 Fperp_avg = np.zeros([number_ind])
@@ -290,8 +296,8 @@ for i,n in enumerate(rank_indices):
     ds = pysac.yt.SACGDFDataset(gdf_files[n])
     #ds = ts[n]
     [bfield, vfield, density,
-     valf, cs, beta] = util.process_next_step_yt(ds, cube_slice, bfield, vfield,
-                                                 density, valf, cs, beta)
+     valf, cs, beta, r_pos] = util.process_next_step_yt(ds, cube_slice, bfield, vfield,
+                                                 density, valf, cs, beta, r_pos)
 
     bpert = util.update_yt_to_mlab_vector(bpert, ds,
                                           'mag_field_x_pert',
@@ -326,6 +332,8 @@ for i,n in enumerate(rank_indices):
     surface_beta = ttf.update_interpolated_scalars(surface.output, surface_beta_filter)
     surface_cs = ttf.update_interpolated_scalars(surface.output, surface_cs_filter)
 
+    surface_r_pos = ttf.update_interpolated_scalars(surface.output, surface_r_pos_filter)
+
     #Save the file
     writer = ttf.PolyDataWriter(path_join("Fieldline_surface_{}_{:05d}.vtp".format(cfg.get_identifier(), n+1)),
                                 surface.output)
@@ -334,13 +342,15 @@ for i,n in enumerate(rank_indices):
                      phi=torsionals,
                      vperp=vperp,
                      vpar=vpar,
+                     vphi=vphi,
                      bpertperp=bpertperp,
                      bpertpar=bpertpar,
                      bpertphi=bpertphi,
                      surface_density=surface_density,
                      surface_va=surface_va,
                      surface_beta=surface_beta,
-                     surface_cs=surface_cs)
+                     surface_cs=surface_cs,
+                     surface_r_pos=surface_r_pos)
     writer.write()
     #print 'rank', rank, 0.5, b2h(psutil.virtual_memory().active)
     #print 'rank', rank, 0.5, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -372,6 +382,8 @@ for i,n in enumerate(rank_indices):
     va_line[i] = surface_va[surf_line_index]
     beta_line[i] = surface_beta[surf_line_index]
     cs_line[i] = surface_cs[surf_line_index]
+
+    r_pos_line[i] = surface_r_pos[surf_line_index]
 
     del vpar, vperp, vphi, bpertperp, bpertpar, bpertphi, surface_density, surface_va, surface_beta, surface_cs
     #print 'rank', rank, 1, b2h(psutil.virtual_memory().active)
