@@ -43,7 +43,7 @@ sac/sac/vac
 *.png
 */*.png
 
-*.o*
-*.e*
+*/*.o*
+*/*.e*
 *.po*
 *.save
