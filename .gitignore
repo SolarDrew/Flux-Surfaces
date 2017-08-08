@@ -39,6 +39,7 @@ sac/sac/vac
 *.ini
 *.gdf
 *.png
+*/*.png
 
 *.o*
 *.e*
