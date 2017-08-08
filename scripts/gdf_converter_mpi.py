@@ -91,7 +91,7 @@ arr_slice =  np.s_[s[1]:e[1],s[2]:e[2],s[0]:e[0]]
 # Reconstruct the whole x array on all the processors
 #==============================================================================
 # x shape: [z, x, y, z]
-"""x_slice =  np.s_[s[0]:e[0],s[1]:e[1],s[2]:e[2],:]
+x_slice =  np.s_[s[0]:e[0],s[1]:e[1],s[2]:e[2],:]
 x = np.zeros(full_nx+[3])
 print '::', rank, ':', x.shape, x[x_slice].shape, vfile.x.shape, arr_slice
 x[x_slice] = vfile.x
@@ -116,27 +116,27 @@ else:
 print 'finished gatheringness', rank
 
 # Transfer the C order X array to all ranks
-x = comm.bcast(x_xyz, root=0)"""
+x = comm.bcast(x_xyz, root=0)
 
-"""x = vfile.x
-left = np.array([x[1][0,0,0], #.to(u.m).value,
+#x = vfile.x
+"""left = np.array([x[1][0,0,0], #.to(u.m).value,
         x[2][0,0,0], #.to(u.m).value,
         x[0][0,0,0]]) #.to(u.m).value]
 right = np.array([x[1][-1,-1,-1], #.to(u.m).value,
          x[2][-1,-1,-1], #.to(u.m).value,
          x[0][-1,-1,-1]]) #.to(u.m).value]
-print '>>', rank, left, right
+print '>>', rank, left, right, left.shape
 
 comm.Allreduce(left, left, MPI.MIN)
 comm.Allreduce(right, right, MPI.MAX)"""
-left = [-1.0e6, -1.0e6, 0.0]
-right = [1.0e6, 1.0e6, 1.6e6]
+left = u.Quantity([-1.0e6, -1.0e6, 0.0], u.meter)
+right = u.Quantity([1.0e6, 1.0e6, 1.6e6], u.meter)
 
 #print '<<', rank, left, right
 
 # Make it a quantity.
-x = u.Quantity(np.ones((1,1,1)), u.meter)
-#x = u.Quantity(x, u.meter)
+#x = u.Quantity(np.ones((1,1,1)), u.meter)
+x = u.Quantity(x, u.meter)
 
 #==============================================================================
 # Save a gdf file
@@ -147,6 +147,8 @@ for i in range(0,vfile.num_records,1):
     header, fields = get_header_fields(vfile)
     #print fields['density_bg']['field'].shape, full_nx
     #header['nx'] = full_nx
+    for fieldname, field in fields.iteritems():
+        print rank, i, fieldname, field['field'].mean(), field['field'].unit
     header['nx'] = [full_nx[1], full_nx[2], full_nx[0]]
 
     print rank, i, cfg.get_identifier()+'_{:05d}.gdf'.format(i+1)
@@ -154,13 +156,13 @@ for i in range(0,vfile.num_records,1):
                                cfg.get_identifier()+'_{:05d}.gdf'.format(i+1)),
                   'w', driver='mpio', comm=MPI.COMM_WORLD)
 
-    if full_nx[0]*full_nx[1]*full_nx[2] <= 64*64*32:
-        write_gdf(f, header, x, fields, arr_slice=arr_slice,
-                  data_author = "Drew Leonard",
-                  data_comment = "Converted from outfiles in parallel", collective=False)#True)
-    else:
-        write_gdf_highres(f, header, left, right, fields, arr_slice=arr_slice,
-                          data_author = "Drew Leonard",
-                          data_comment = "Converted from outfiles in parallel", collective=False)
+    #if full_nx[0]*full_nx[1]*full_nx[2] <= 64*64*32:
+    write_gdf(f, header, x, fields, arr_slice=arr_slice,
+              data_author = "Drew Leonard",
+              data_comment = "Converted from outfiles in parallel", collective=True)
+    #else:
+    #    write_gdf_highres(f, header, left, right, fields, arr_slice=arr_slice,
+    #                      data_author = "Drew Leonard",
+    #                      data_comment = "Converted from outfiles in parallel", collective=False)
 
 print "rank %i finishes"%rank
