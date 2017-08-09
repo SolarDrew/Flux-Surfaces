@@ -27,7 +27,7 @@ sys.path.append('../')
 from scripts import sacconfig
 
 import resource
-import objgraph
+#import objgraph
 import psutil
 
 try:
@@ -134,6 +134,9 @@ if rank == 0:
     #nlines is the number of fieldlines used in the surface
     n_lines = 100
     #the line is the fieldline to use as "the line"
+#### =============
+#### THIS WANTS CHANGING BEFORE I RERUN ANYTHING BECAUSE IT TALKS A LOT OF BALLS
+#### =============
     line_n = 25
 
     seeds_slice = np.s_[:,:,top_cut-1]#slicing upto -5 is not the same as indexing -5
@@ -333,6 +336,12 @@ for i,n in enumerate(rank_indices):
     surface_cs = ttf.update_interpolated_scalars(surface.output, surface_cs_filter)
 
     surface_r_pos = ttf.update_interpolated_scalars(surface.output, surface_r_pos_filter)
+    """if i == 0:
+        if n == 0:
+            rpos0 = surface_r_pos
+        else:
+            rpos0 = None
+        rpos0 = comm.bcast(rpos0, 0)"""
 
     #Save the file
     writer = ttf.PolyDataWriter(path_join("Fieldline_surface_{}_{:05d}.vtp".format(cfg.get_identifier(), n+1)),
@@ -351,6 +360,13 @@ for i,n in enumerate(rank_indices):
                      surface_beta=surface_beta,
                      surface_cs=surface_cs,
                      surface_r_pos=surface_r_pos)
+
+    """try:
+        surface_dr = surface_r_pos - rpos0
+        writer.add_array(surface_dr=surface_dr)
+    except ValueError as e:
+        print('Failed radial displacement calculation for time-step {}'.format(t))
+        print(e)"""
     writer.write()
     #print 'rank', rank, 0.5, b2h(psutil.virtual_memory().active)
     #print 'rank', rank, 0.5, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
@@ -478,7 +494,7 @@ for i,n in enumerate(rank_indices):
     #print 'rank {} step {}'.format(rank, i), objgraph.show_growth()#limit=5)
     print 'rank', rank, 11, b2h(psutil.virtual_memory().active)
     #print 'rank', rank, 11, resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    objgraph.show_growth(limit=5)
+    #objgraph.show_growth(limit=5)
     print "%i: Done Flux %i \n%i: Step %i / %i"%(rank,n,rank,i,len(rank_indices))
 
 #==============================================================================
