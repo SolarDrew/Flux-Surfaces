@@ -34,6 +34,7 @@ sac/sac/src/.deps
 sac/sac/src/vacusr.t.*
 sac/sac/src/vacusrpar.t.*
 sac/sac/vac
+figs/
 
 *.pkl
 *.pytxmcr
