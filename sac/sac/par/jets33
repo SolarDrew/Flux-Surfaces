@@ -1,0 +1,43 @@
+&testlist
+/
+
+&filelist
+	filenameini='/fastdata/sm1ajl/inidata/3D_tube_128_128_128_np020204.ini'
+    typefileini='binary'
+    fullgridini=T
+    fullgridout=T
+	filename=   'data/jets33.log',
+    		    'data/jets33.out'
+	typefileout='binary'
+/
+
+&savelist
+	itsave(1,2)=0
+	ditsave=5,5
+/
+
+&stoplist
+	tmax=1800
+/
+
+&methodlist
+
+	wnames=	'h m1 m2 m3 e b1 b2 b3 eb rhob bg1 bg2 bg3'
+	typefull=	8*'cd4',5*'nul'
+        typeadvance=    'fourstep'
+	typefilter=	13*'nul'
+	dimsplit=	F
+	sourcesplit=	F
+	divBfix=	F
+	smallp= 	0.6d0
+ /
+
+&boundlist
+	typeB=	13*'cont'
+	        13*'cont'
+	        13*'cont'
+	        13*'cont'
+/
+
+&paramlist
+/
