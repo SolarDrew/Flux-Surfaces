@@ -2,7 +2,7 @@
 #$ -l h_rt=1:00:00
 #$ -cwd
 # #$ -l arch=intel*
-#$ -pe openmpi-ib 8
+#$ -pe openmpi-ib 32
 #$ -l mem=10G
 #$ -l rmem=8G
 # #$ -P mhd
@@ -19,7 +19,7 @@ echo
 source $HOME/.bashrc
 module purge
 module load apps/python/conda
-module load mpi/gcc/openmpi/1.10.0
+module load mpi/openmpi/2.0.1/gcc-6.2
 #source activate mpi-sac
 source activate mayavi2
 echo $(which python)
@@ -73,7 +73,7 @@ do
     ./configure.py set SAC --usr_script=$mode
     ./configure.py print
     set +e
-    xvfb-run --auto-servernum python ./run.py analysis --mpi --np=8 --tube-r=$tuber
+    xvfb-run --auto-servernum python ./run.py analysis --mpi --np=32 --tube-r=$tuber
     set +e
     kill $XVFBPID
     set -e

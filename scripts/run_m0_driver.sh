@@ -57,7 +57,7 @@ cp scripts/vac_config.par.modedrivers scripts/vac_config.par
 
 #### Run SAC ####
 #python ./run.py SAC --mpi
-python ./run.py gdf --mpi
+#python ./run.py gdf --mpi
 
 #### Run the CODE! ####
 # tube_radii=( 'r126' 'r120' 'r114' 'r108' 'r102' 'r96' 'r90' 'r84' 'r78' 'r72' 'r66' 'r60' 'r54' 'r48' 'r42' 'r36' 'r30' 'r24' 'r18' 'r12' 'r06')
