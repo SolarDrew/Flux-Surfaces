@@ -64,7 +64,7 @@ cg = ds.h.grids[0]
 #nlines is the number of fieldlines used in the surface
 n_lines = 100
 #the line is the fieldline to use as "the line"
-line_n = 25
+line_n = 0
 #==============================================================================
 
 tube_r = arguments['--tube-r']

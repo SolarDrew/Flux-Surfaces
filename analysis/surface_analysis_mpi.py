@@ -134,10 +134,7 @@ if rank == 0:
     #nlines is the number of fieldlines used in the surface
     n_lines = 100
     #the line is the fieldline to use as "the line"
-#### =============
-#### THIS WANTS CHANGING BEFORE I RERUN ANYTHING BECAUSE IT TALKS A LOT OF BALLS
-#### =============
-    line_n = 25
+    line_n = 0
 
     seeds_slice = np.s_[:,:,top_cut-1]#slicing upto -5 is not the same as indexing -5
 
