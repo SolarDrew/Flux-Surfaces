@@ -1,5 +1,5 @@
 #!/bin/bash -e
-#$ -l h_rt=1:00:00
+#$ -l h_rt=3:00:00
 #$ -cwd
 # #$ -l arch=intel*
 #$ -pe openmpi-ib 32
@@ -21,7 +21,7 @@ module purge
 module load apps/python/conda
 module load mpi/openmpi/2.0.1/gcc-6.2
 #source activate mpi-sac
-source activate mayavi2
+source activate mpi-mayavi2
 echo $(which python)
 echo $(which mpirun)
 echo $(which mpif90)
